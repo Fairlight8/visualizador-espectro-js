@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+   <input id="archivoAudio" type="file" accept="audio/*"/>
+<div id="message"></div>
+<audio id="music" autoplay="autoplay" controls>
+  El tag audio no está soportado en este navegador
+</audio> 
+    <script>
+    
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    var audioCtx = new AudioContext();
+    var nodoAudio = audioCtx.createMediaElementSource($("#music").get(0));
+    var analizador = audioCtx.createAnalyser();
+    nodoAudio.connect(analizador);
+    analizador.connect(audioCtx.destination)
+
+    $("#archivoAudio").change(function(evento){
+       cancion=evento.currentTarget.files[0]
+       if(cancion){         
+           var reader = new FileReader();
+           reader.onload = function(eventoreader){
+               $("#music").attr("src",eventoreader.target.result);
+           };
+           reader.readAsDataURL(cancion)
+            
+        }
+    });
+    
+    </script>
+</body>
+</html>

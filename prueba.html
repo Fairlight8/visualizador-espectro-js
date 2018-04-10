@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="">
 <head>
@@ -9,12 +10,20 @@
 </head>
 
 <body>
+  <div id="contenido"></div>
    <input id="archivoAudio" type="file" accept="audio/*"/>
 <div id="message"></div>
 <audio id="music" autoplay="autoplay" controls>
   El tag audio no está soportado en este navegador
 </audio> 
+   <button id="act"></button>
     <script>
+    function actualizar(){
+        
+        analizador.getByteFrequencyData(dataArray);
+       $("#contenido").html(dataArray.toString());
+        
+    };
     
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     var audioCtx = new AudioContext();
@@ -22,7 +31,14 @@
     var analizador = audioCtx.createAnalyser();
     nodoAudio.connect(analizador);
     analizador.connect(audioCtx.destination)
-
+        
+    analizador.fftSize = 32;
+    
+    var tambufer = analizador.fftSize;
+        
+    var dataArray = new Uint8Array(tambufer);
+    analizador.getByteFrequencyData(dataArray);
+        
     $("#archivoAudio").change(function(evento){
        cancion=evento.currentTarget.files[0]
        if(cancion){         
@@ -31,9 +47,10 @@
                $("#music").attr("src",eventoreader.target.result);
            };
            reader.readAsDataURL(cancion)
-            
+            window.setInterval(actualizar,10)
         }
     });
+    
     
     </script>
 </body>

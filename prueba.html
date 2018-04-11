@@ -4,13 +4,25 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>AppWeb</title>
     <link rel="stylesheet" href="">
+    <style>
+        .barra{
+            width:1px;
+            height:256px;
+            background-color: red;
+            float:left;
+        }
+    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
 </head>
 
 <body>
-  <div id="contenido"></div>
+ <div id="texto"></div>
+  <div id="contenido">
+      
+  </div>
    <input id="archivoAudio" type="file" accept="audio/*"/>
 <div id="message"></div>
 <audio id="music" autoplay="autoplay" controls>
@@ -21,23 +33,31 @@
     function actualizar(){
         
         analizador.getByteFrequencyData(dataArray);
-       $("#contenido").html(dataArray.toString());
+       for (i = 0; i < tambufer; i++) {
+           $(".barra").get(i).style.height = dataArray[i].toString() + "px";
+       }
+        $("#texto").html(dataArray[1]);    
+        
         
     };
-    
+
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     var audioCtx = new AudioContext();
     var nodoAudio = audioCtx.createMediaElementSource($("#music").get(0));
     var analizador = audioCtx.createAnalyser();
     nodoAudio.connect(analizador);
-    analizador.connect(audioCtx.destination)
+    analizador.connect(audioCtx.destination);
         
-    analizador.fftSize = 32;
+    analizador.fftSize = 256;
     
     var tambufer = analizador.fftSize;
         
     var dataArray = new Uint8Array(tambufer);
     analizador.getByteFrequencyData(dataArray);
+        
+    for (i = 0; i < tambufer; i++) {
+        $("#contenido").append("<div class='barra'></div>")
+    }
         
     $("#archivoAudio").change(function(evento){
        cancion=evento.currentTarget.files[0]
@@ -47,7 +67,7 @@
                $("#music").attr("src",eventoreader.target.result);
            };
            reader.readAsDataURL(cancion)
-            window.setInterval(actualizar,10)
+            window.setInterval(actualizar,20)
         }
     });
     

@@ -7,16 +7,31 @@
     <title>AppWeb</title>
     <link rel="stylesheet" href="">
     <style>
-        .barra {
-            width: 30px;
-            height: 256px;
-            background-color: red;
+        body{
+            height: 100%;
+width: 100%;
+margin: 0px;
+        }
+        #contenido{
+            height: calc(100% - 100px);
+position: absolute;
+width: 100%;
+        }
+        .barrawr {
+            width: 3.1%;
+            
+            height: calc( 100% - 100px );
             float: left;
             font-size: 10px;
+            position: sticky;
         }
+        .barra{position: absolute;bottom: 0px;background-color: red;
+            width:80%;
+        right:0px;}
         #player{
             position: absolute;
             bottom: 0px;
+            
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -108,7 +123,7 @@
 
             analizador.getByteFrequencyData(dataArray);
             for (i = 0; i < 32; i++) {
-                $(".barra").get(i).style.height = (dataArray[numbarra[i]] + 1).toString() + "px";
+                $(".barra").get(i).style.height = (dataArray[numbarra[i]]/2.56).toString() + "%";
             }
             $("#texto").html(dataArray[1]);
 
@@ -122,7 +137,7 @@
         analizador.connect(audioCtx.destination);
 
         analizador.fftSize = 32768;
-        analizador.smoothingTimeConstant = 0.4;
+        analizador.smoothingTimeConstant = 0.8;
 
         var tambufer = analizador.fftSize;
 
@@ -130,7 +145,7 @@
         analizador.getByteFrequencyData(dataArray);
 
         for (i = 0; i < 32; i++) {
-            $("#contenido").append("<div class='barra'>"+freqbarra[i].toString()+"</div>")
+            $("#contenido").append("<div class='barrawr'><div class='barra'>"+freqbarra[i].toString()+"</div></div>")
         }
 
         $("#archivoAudio").change(function(evento) {

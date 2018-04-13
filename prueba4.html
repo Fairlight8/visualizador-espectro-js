@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppWeb</title>
+    <link rel="stylesheet" href="">
+    <style>
+        body {
+            height: 100%;
+            width: 100%;
+            margin: 0px;
+        }
+
+        #contenido {
+            height: calc(100% - 100px);
+            position: absolute;
+            width: 100%;
+        }
+
+        .barrawr {
+            width: 3.1%;
+
+            height: calc( 100% - 100px);
+            float: left;
+            font-size: 10px;
+            position: sticky;
+        }
+
+        .barra {
+            position: absolute;
+            bottom: 0px;
+            background-color: red;
+            width: 80%;
+            right: 0px;
+        }
+
+        #player {
+            position: absolute;
+            bottom: 0px;
+
+        }
+
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+    <div id="texto"></div>
+    <div id="contenido">
+
+    </div>
+    <div id="player"><input id="archivoAudio" type="file" accept="audio/*" />
+        <audio id="music" autoplay="autoplay" controls>
+  El tag audio no está soportado en este navegador
+</audio></div>
+
+
+    <script>
+        numbarra = [
+            18,//barra para que no salten excepciones
+            22,
+            28,
+            34,
+            42,
+            51,
+            63,
+            78,
+            95,
+            117,
+            143,
+            176,
+            214,
+            262,
+            320,
+            392,
+            479,
+            586,
+            717,
+            876,
+            1071,
+            1309,
+            1600,
+            1956,
+            2390,
+            2921,
+            3570,
+            4362,
+            5331,
+            6514,
+            7960,
+            9728,
+            11887,
+            14502//barra para que no salten expeciones
+        ]
+        freqbarra = [
+            32,
+            39,
+            48,
+            58,
+            71,
+            87,
+            107,
+            130,
+            159,
+            194,
+            238,
+            290,
+            355,
+            433,
+            530,
+            647,
+            791,
+            967,
+            1181,
+            1443,
+            1764,
+            2155,
+            2634,
+            3218,
+            3933,
+            4806,
+            5872,
+            7176,
+            8769,
+            10715,
+            13094,
+            16000
+        ]
+
+        function actualizar() {
+            var promedioizq = 0.0;
+            var promediodcha = 0.0;
+            var barraabarra=0;
+            var sumatorio=0;
+            var contadorbarras=0;
+            var ordenponderado=64;
+            analizador.getByteFrequencyData(dataArray);
+            for (i = 0; i < 32; i++) {
+                //Ponderamos la barra y los alrededores
+                //Contamos hacia la izquierda
+                contadorbarras=barraabarra=(numbarra[i+1]-numbarra[i])/2;
+                while(barraabarra>0){
+                    sumatorio+=(barraabarra^ordenponderado);
+                    promedioizq+=dataArray[numbarra[i+1]-(contadorbarras-barraabarra)]*(barraabarra^ordenponderado);
+                    barraabarra--;
+                }
+                promedioizq/=sumatorio;
+                sumatorio=0;
+                contadorbarras=barraabarra=(numbarra[i+2]-numbarra[i+1])/2;
+                while(barraabarra>0){
+                    sumatorio+=(barraabarra^ordenponderado);
+                    promediodcha+=dataArray[numbarra[i+1]+(contadorbarras-barraabarra)]*(barraabarra^ordenponderado);
+                    barraabarra--;
+                }
+                promediodcha/=sumatorio;
+                sumatorio=0;
+                //Lo ponemos en la altura
+                $(".barra").get(i).style.height = ((promediodcha+promedioizq)*(100+i)/ 512).toString() + "%";
+            }
+            
+
+
+        };
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        var audioCtx = new AudioContext();
+        var nodoAudio = audioCtx.createMediaElementSource($("#music").get(0));
+        var analizador = audioCtx.createAnalyser();
+        nodoAudio.connect(analizador);
+        analizador.connect(audioCtx.destination);
+
+        analizador.fftSize = 32768;
+        analizador.smoothingTimeConstant = 0.4;
+
+        var tambufer = analizador.fftSize;
+
+        var dataArray = new Uint8Array(tambufer);
+        analizador.getByteFrequencyData(dataArray);
+
+        for (i = 0; i < 32; i++) {
+            $("#contenido").append("<div class='barrawr'><div class='barra'>" + freqbarra[i].toString() + "</div></div>")
+        }
+
+        $("#archivoAudio").change(function(evento) {
+            cancion = evento.currentTarget.files[0]
+            if (cancion) {
+                var reader = new FileReader();
+                reader.onload = function(eventoreader) {
+                    $("#music").attr("src", eventoreader.target.result);
+                };
+                reader.readAsDataURL(cancion)
+                window.setInterval(actualizar, 20)
+            }
+        });
+
+    </script>
+</body>
+
+</html>

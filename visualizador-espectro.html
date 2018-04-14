@@ -39,6 +39,7 @@
         #player {
             position: absolute;
             bottom: 0px;
+            width:100%;
 
         }
 
@@ -52,8 +53,8 @@
     <div id="contenido">
 
     </div>
-    <div id="player"><input id="archivoAudio" type="file" accept="audio/*" />
-        <audio id="music" autoplay="autoplay" controls>
+    <div id="player"><input style="width: 50%;float: left;" id="archivoAudio" type="file" accept="audio/*" />
+        <audio id="music" autoplay="autoplay" style="width: 50%;float: left;" controls>
   El tag audio no está soportado en este navegador
 </audio></div>
 
@@ -129,16 +130,17 @@
             13094,
             16000
         ]
-
+        var contadorcolor = 0;
         function actualizar() {
+
+            analizador.getByteFrequencyData(dataArray);
+            for (i = 0; i < 32; i++) {
             var promedioizq = 0.0;
             var promediodcha = 0.0;
             var barraabarra=0;
             var sumatorio=0;
             var contadorbarras=0;
-            var ordenponderado=64;
-            analizador.getByteFrequencyData(dataArray);
-            for (i = 0; i < 32; i++) {
+            var ordenponderado=16;
                 //Ponderamos la barra y los alrededores
                 //Contamos hacia la izquierda
                 contadorbarras=barraabarra=(numbarra[i+1]-numbarra[i])/2;
@@ -159,9 +161,15 @@
                 sumatorio=0;
                 //Lo ponemos en la altura
                 $(".barra").get(i).style.height = ((promediodcha+promedioizq)*(100+i)/ 512).toString() + "%";
+                $(".barra").get(i).style.backgroundColor = "hsl("+(((promediodcha+promedioizq)*(100+i)/ 350)-contadorcolor).toString()+",100%,50%)";
             }
             
-
+            if(contadorcolor<360){
+                contadorcolor+=0.25;
+            }
+            else{
+                contadorcolor=0;
+            }
 
         };
         var AudioContext = window.AudioContext || window.webkitAudioContext;
